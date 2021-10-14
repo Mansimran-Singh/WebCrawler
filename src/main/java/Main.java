@@ -1,22 +1,16 @@
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.apache.log4j.BasicConfigurator;
+import org.junit.internal.TextListener;
+import org.junit.runner.JUnitCore;
 
-public class Main {
-
+public class Main extends FnLib{
     public static void main(String[] args) {
-        WebDriverManager.chromedriver().setup();
-        //Create driver object for Chrome
-        WebDriver driver = new ChromeDriver();
-        //Navigate to a URL
-        driver.get("http://www.ccsu.edu");
-        //Sleep
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //Quit the Driver
-        driver.quit();
+        // Print stack
+//        BasicConfigurator.configure();
+        // Set up jUnitCore
+        JUnitCore junit = new JUnitCore();
+        // Listener to print returned outputs
+        junit.addListener(new TextListener(System.out));
+        // Run Scraping Tests
+        junit.run(WebScrapeTests.class);
     }
 }
