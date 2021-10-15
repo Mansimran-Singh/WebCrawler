@@ -146,21 +146,6 @@ public class FnLib {
     }
 
 
-    /**
-     * explicitWait on an element
-     * @param objType takes object type like xpath, id ...
-     * @param objProp takes object property
-     * @param sec integer seconds
-     */
-    protected final void explicitWait(String objType, String objProp,int sec){
-        WebDriverWait wait = new WebDriverWait(driver, sec);
-        switch(objType.toLowerCase()) {
-            case "xpath": {wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(objProp))); break;}
-            case "name": {wait.until(ExpectedConditions.visibilityOfElementLocated(By.name(objProp))); break;}
-            case "id": {wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(objProp))); break;}
-        }
-    }
-
 
     /**
      * highlightElem to highlight the element on WebView only

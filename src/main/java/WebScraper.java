@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class WebScrapeTests extends FnLib{
+public class WebScraper extends FnLib{
 
     @Before
     public void setUp() {
