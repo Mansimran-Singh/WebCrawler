@@ -9,5 +9,8 @@
         <module name="WebCrawler" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="WebCrawler" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
