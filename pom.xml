@@ -13,7 +13,7 @@
   <groupId>myGroup</groupId>
   <artifactId>webcrawler-plugin</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
 
   <properties>
     <project.build.sourceEnconding>UTF-8</project.build.sourceEnconding>
@@ -63,7 +63,7 @@
   <scm>
     <developerConnection>scm:git:https://github.com/Mansimran-Singh/WebCrawler.git</developerConnection>
     <url>https://github.com/Mansimran-Singh/WebCrawler</url>
-    <tag>webcrawler-plugin-1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>
