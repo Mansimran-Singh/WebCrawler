@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Publish package to GitHub Packages
+name: Publish package to GitHub Packageshttps://github.com/Mansimran-Singh/WebCrawler/blob/main/main.yml
 
 # Controls when the workflow will run
 on:
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
-          java-version: '1.8'
+          java-version: 1.8
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
