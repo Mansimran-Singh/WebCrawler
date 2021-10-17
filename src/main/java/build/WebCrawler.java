@@ -1,13 +1,14 @@
 package build;
 
+import com.google.type.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class WebCrawler {
@@ -59,10 +60,17 @@ public class WebCrawler {
         for (int i = 0; i<ulList.size(); i++){
             Elements liList = ulList.get(i).select("li > a");
             int finalI = i;
-                liList.forEach(li->{
 
+                liList.forEach(li->{
+                    Date mDate = null;
+                    try {
+                        mDate=new SimpleDateFormat("dd MMMM yyyy").parse(headers.get(finalI).text());
+                        System.out.println(mDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     Movie m = new Movie(
-                            li.text(), headers.get(finalI).text(),
+                            li.text(),mDate,
                             li.attr("abs:href"),null);
                     movies.add(m);
 //                    System.out.println(m.title);
