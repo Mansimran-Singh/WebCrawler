@@ -60,8 +60,6 @@ class Crawl {
      * @return boolean true or false depending upon check respectively.
      */
     boolean validateRobotsText(String url){
-        // Get disallowed URLs list of String for Robots.txt Disallow Check
-        List<String> robotsDisallowURLs = getRobotsDisallowedURLs();
         // Printing disallowed list
         // System.out.println(robotsDisallowURLs);
         // If URL present in disallowed or robots.txt not found return false else true
@@ -164,6 +162,8 @@ class Crawl {
                 try {
                     // join
                     thread.join();
+                    // Print the id of closed thread
+                    System.out.println("Joined & Closed Thread | Id: " + thread.getId());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
