@@ -27,6 +27,9 @@ class Crawl {
     final String URL_404 = "https://www.rooseveltlibrary.org/wp-content/uploads/2016/10/PageNotFound.png";
     // Initializing list of Movie for movies
     private final List<Movie> movies = new ArrayList<>();
+    // Initializing list of String for disallowed urls from robots.txt
+    private List<String> robotsDisallowURLs = new ArrayList<>();
+
 
     /**
      * Private Method to retrieve robots.txt for obeying
@@ -42,7 +45,7 @@ class Crawl {
             // Remove information data
             disallowedList.remove(0);
             // Uncomment below to indent base url to disallowed
-            // list.replaceAll(s -> URL_BASE+s);
+            disallowedList.replaceAll(s -> URL_BASE+s);
             //return list
             return disallowedList;
         } catch (IOException e) {
@@ -52,16 +55,29 @@ class Crawl {
     }
 
     /**
+     * Private Method to validate the URL's hit are not present in robots.txt
+     * @param url is the url to be validated
+     * @return boolean true or false depending upon check respectively.
+     */
+    boolean validateRobotsText(String url){
+        // Get disallowed URLs list of String for Robots.txt Disallow Check
+        List<String> robotsDisallowURLs = getRobotsDisallowedURLs();
+        // Printing disallowed list
+        // System.out.println(robotsDisallowURLs);
+        // If URL present in disallowed or robots.txt not found return false else true
+        if(robotsDisallowURLs != null)
+        return !robotsDisallowURLs.contains(url);
+        else return false;
+    }
+
+    /**
      * Method can be called from same package.
      * Method is called from Main class to start crawling and retrieve the movie list.
      */
     void getMoviesList() {
 
-        // Get disallowed URLs list of String for Robots.txt Disallow Check
-        List<String> robotsDisallowURLs = getRobotsDisallowedURLs();
-
-        // Printing disallowed list --- NEED SOME LOGIC TO VALIDATE
-        System.out.println(robotsDisallowURLs);
+        // Get disallowed URL's from robots.txt before doing anything
+        robotsDisallowURLs = getRobotsDisallowedURLs();
 
         // Call to get table method to retrieve html elements of main table
         Elements table = getTable();
@@ -168,13 +184,19 @@ class Crawl {
      * @return a table of type Elements for further parsing
      */
     private Elements getTable() {
-        try {
-            // Get the main imdb calendar URL
-            Document document = Jsoup.connect(URL_CALENDAR).get();
-            // Select the main table from page and return table
-            return document.select("#main ");
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+
+        // Validate Calendar URL with Robots.txt
+        boolean validatedURL = validateRobotsText(URL_CALENDAR);
+        // If URL is not present in disallowed list
+        if (validatedURL){
+            try {
+                // Get the main imdb calendar URL
+                Document document = Jsoup.connect(URL_CALENDAR).get();
+                // Select the main table from page and return table
+                return document.select("#main ");
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+            }
         }
         return null;
     }
@@ -193,29 +215,33 @@ class Crawl {
                 // Condition statement to check if the movie is not present in firestore
                 if (Firestore.checkIfTitleIsNew(movie.title)) {
 
-                    // Retrieve HTML Page from movie url
-                    Document htmlPage = Jsoup.connect(movie.url).get();
-                    movie.htmlPage = htmlPage;
+                    // Validate movie.url with Robots.txt
+                    boolean validatedURL = validateRobotsText(movie.url);
+                    // If URL is not present in disallowed list
+                    if (validatedURL){
+                        // Retrieve HTML Page from movie url
+                        Document htmlPage = Jsoup.connect(movie.url).get();
+                        movie.htmlPage = htmlPage;
+                        // Retrieve images from multiple links
+                        Element a = htmlPage.select("a.ipc-lockup-overlay").first();
+                        String s = a.attr("abs:href");
+                        Document sPage = Jsoup.connect(s).get();
+                        Elements images = sPage.select("img[class*=bnaOri]");
 
-                    // Retrieve images from multiple links
-                    Element a = htmlPage.select("a.ipc-lockup-overlay").first();
-                    String s = a.attr("abs:href");
-                    Document sPage = Jsoup.connect(s).get();
-                    Elements images = sPage.select("img[class*=bnaOri]");
-
-                    // Find src image for movie
-                    if (images.size()>0){
-                        if (images.first().attr("src") != null) {
-                            movie.posterUrl = images.first().attr("src");
+                        // Find src image for movie
+                        if (images.size()>0){
+                            if (images.first().attr("src") != null) {
+                                movie.posterUrl = images.first().attr("src");
+                            }
+                            else{
+                                // If not found adding a 404 page
+                                movie.posterUrl = URL_404;
+                            }
                         }
                         else{
                             // If not found adding a 404 page
                             movie.posterUrl = URL_404;
                         }
-                    }
-                    else{
-                        // If not found adding a 404 page
-                        movie.posterUrl = URL_404;
                     }
 
                     // Add movie to firestore database
