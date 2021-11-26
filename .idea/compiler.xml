@@ -6,11 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="WebCrawler" />
+        <module name="Crawler" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="WebCrawler" target="8" />
-    </bytecodeTargetLevel>
   </component>
 </project>
