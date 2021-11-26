@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Mansimran Singh
@@ -18,18 +17,51 @@ import java.util.concurrent.ExecutionException;
  */
 class Crawl {
 
+    // final BASE URL
+    final String URL_BASE = "https://www.imdb.com";
+    // final Robots.txt URL
+    final String URL_ROBOTS = URL_BASE +"/robots.txt";
+    // final URL imdb calendar site
+    final String URL_CALENDAR = URL_BASE + "/calendar";
+    // final URL_404
+    final String URL_404 = "https://www.rooseveltlibrary.org/wp-content/uploads/2016/10/PageNotFound.png";
     // Initializing list of Movie for movies
     private final List<Movie> movies = new ArrayList<>();
-    // final Hardcoded URL imdb calendar site
-    final String URL = "https://www.imdb.com/calendar";
-    // final Hardcoded URL404
-    final String URL404 = "https://www.rooseveltlibrary.org/wp-content/uploads/2016/10/PageNotFound.png";
+
+    /**
+     * Private Method to retrieve robots.txt for obeying
+     * @return List of disallowed URL String
+     */
+    private List<String> getRobotsDisallowedURLs(){
+        // Get the imdb robots.txt
+        try {
+            // Read URL_ROBOTS
+            Document document = Jsoup.connect(URL_ROBOTS).get();
+            // Create a list of Disallowed URLS
+            List<String> disallowedList = new ArrayList<>(Arrays.asList(document.body().text().split("Disallow: ")));
+            // Remove information data
+            disallowedList.remove(0);
+            // Uncomment below to indent base url to disallowed
+            // list.replaceAll(s -> URL_BASE+s);
+            //return list
+            return disallowedList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * Method can be called from same package.
      * Method is called from Main class to start crawling and retrieve the movie list.
      */
     void getMoviesList() {
+
+        // Get disallowed URLs list of String for Robots.txt Disallow Check
+        List<String> robotsDisallowURLs = getRobotsDisallowedURLs();
+
+        // Printing disallowed list --- NEED SOME LOGIC TO VALIDATE
+        System.out.println(robotsDisallowURLs);
 
         // Call to get table method to retrieve html elements of main table
         Elements table = getTable();
@@ -138,7 +170,7 @@ class Crawl {
     private Elements getTable() {
         try {
             // Get the main imdb calendar URL
-            Document document = Jsoup.connect(URL).get();
+            Document document = Jsoup.connect(URL_CALENDAR).get();
             // Select the main table from page and return table
             return document.select("#main ");
         } catch (IOException e) {
@@ -178,12 +210,12 @@ class Crawl {
                         }
                         else{
                             // If not found adding a 404 page
-                            movie.posterUrl = URL404;
+                            movie.posterUrl = URL_404;
                         }
                     }
                     else{
                         // If not found adding a 404 page
-                        movie.posterUrl = URL404;
+                        movie.posterUrl = URL_404;
                     }
 
                     // Add movie to firestore database
@@ -193,7 +225,7 @@ class Crawl {
                     // Print skipped movie message
                     System.out.println("Skipped because replica document exists | Movie Title: " + movie.title);
                 }
-            } catch (IOException | ExecutionException | InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
