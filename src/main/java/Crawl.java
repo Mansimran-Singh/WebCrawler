@@ -30,6 +30,26 @@ class Crawl {
     // Initializing list of String for disallowed urls from robots.txt
     private List<String> robotsDisallowURLs = new ArrayList<>();
 
+    /**
+     * Politeness Checks
+     * If document returned is null re-run 10 times until non null returned
+     * @param docUrl of type String to download the url
+     * @return Document required to download
+     * @throws IOException throws IO Exception if connection breaks
+     */
+    private Document politeDownload(String docUrl) throws IOException {
+        // Connect JSOUP and Download
+        Document doc = Jsoup.connect(docUrl).userAgent("Crawler for imdb latest releases | CCSU Students").get();
+        // Initialize Counter
+        int counter = 1;
+        // Run in a loop for 10 times until non null present
+        while (doc==null && counter <= 10){
+            doc = Jsoup.connect(docUrl).userAgent("Crawler for imdb latest releases | CCSU Students").get();
+            counter++;
+        }
+        return doc;
+    }
+
 
     /**
      * Private Method to retrieve robots.txt for obeying
@@ -39,7 +59,7 @@ class Crawl {
         // Get the imdb robots.txt
         try {
             // Read URL_ROBOTS
-            Document document = Jsoup.connect(URL_ROBOTS).get();
+            Document document = politeDownload(URL_ROBOTS);
             // Create a list of Disallowed URLS
             List<String> disallowedList = new ArrayList<>(Arrays.asList(document.body().text().split("Disallow: ")));
             // Remove information data
@@ -191,7 +211,7 @@ class Crawl {
         if (validatedURL){
             try {
                 // Get the main imdb calendar URL
-                Document document = Jsoup.connect(URL_CALENDAR).get();
+                Document document = politeDownload(URL_CALENDAR);
                 // Select the main table from page and return table
                 return document.select("#main ");
             } catch (IOException e) {
@@ -220,12 +240,12 @@ class Crawl {
                     // If URL is not present in disallowed list
                     if (validatedURL){
                         // Retrieve HTML Page from movie url
-                        Document htmlPage = Jsoup.connect(movie.url).get();
+                        Document htmlPage = politeDownload(movie.url);
                         movie.htmlPage = htmlPage;
                         // Retrieve images from multiple links
                         Element a = htmlPage.select("a.ipc-lockup-overlay").first();
                         String s = a.attr("abs:href");
-                        Document sPage = Jsoup.connect(s).get();
+                        Document sPage = politeDownload(s);
                         Elements images = sPage.select("img[class*=bnaOri]");
 
                         // Find src image for movie
