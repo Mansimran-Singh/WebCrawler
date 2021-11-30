@@ -7,6 +7,7 @@
 public class App {
     /**
      * Main Method to launch crawler and fetch movies
+     * @param args main method args
      */
     public static void main(String[] args) {
         Crawl wc = new Crawl();
